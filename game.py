@@ -2,8 +2,13 @@
 import pygame
 import objects
 
-## Initialize window 
+## Initialize pygame
+pygame.mixer.pre_init(44100,16,2,4096)
 pygame.init()
+pygame.font.init()
+textFont = pygame.font.SysFont('Comic Sans MS',30)
+WarriorWin = textFont.render('Warrior Wins',False,(0,0,0))
+GoblinWin = textFont.render('Goblin Wins',False,(0,0,0))
 
 screenWidth = 600
 screenHeight = 600
@@ -15,7 +20,11 @@ clock = pygame.time.Clock()
 ## Caption Window
 pygame.display.set_caption("Warrior vs Goblin")
 
+hitSound = pygame.mixer.Sound("hit.wav")
+projectileSound = pygame.mixer.Sound("bullet.wav")
 
+music = pygame.mixer.music.load("music2.mp3")
+pygame.mixer.music.play(-1)
 ## instance of warrior
 warrior = objects.character(0,490,64,64,objects.walkRightWarrior,objects.walkLeftWarrior,objects.charWarrior)
 goblin = objects.character(490,490,64,64,objects.walkRightGoblin,objects.walkLeftGoblin,objects.charGoblin)
@@ -31,7 +40,12 @@ def redrawWindow():
 	
 	for spit in acid:
 		spit.draw(win)
+	
+	if goblin.health == 0:
+		win.blit(WarriorWin,(0,0))
 		
+	if warrior.health == 0:
+		win.blit(GoblinWin,(420,0))
 	pygame.display.update()
 	
 ## Loop till close
@@ -52,6 +66,8 @@ while run:
 		if beam.y - beam.radius < goblin.hitbox[1] + goblin.hitbox[3] and beam.y + beam.radius > goblin.hitbox[1]:
 			if beam.x + beam.radius > goblin.hitbox[0] and beam.x - beam.radius < goblin.hitbox[0]:
 				beams.pop(beams.index(beam))
+				hitSound.play()
+				goblin.hit()
 				
 		if beam.x < 600 and beam.x > 0:
 			beam.x += beam.vel
@@ -62,6 +78,8 @@ while run:
 		if spit.y - spit.radius < warrior.hitbox[1] + warrior.hitbox[3] and spit.y + spit.radius > warrior.hitbox[1]:
 			if spit.x + spit.radius > warrior.hitbox[0] and spit.x - spit.radius < warrior.hitbox[0]:
 				acid.pop(acid.index(spit))
+				hitSound.play()
+				warrior.hit()
 				
 		if spit.x < 600 and spit.x > 0:
 			spit.x += spit.vel
@@ -72,6 +90,7 @@ while run:
 	keys = pygame.key.get_pressed()
 	
 	if keys[pygame.K_RSHIFT]:
+		projectileSound.play()
 		if warrior.right:
 			facing = 1
 			
@@ -123,6 +142,7 @@ while run:
 	
 	## Movement for Goblin
 	if keys[pygame.K_e]:
+		projectileSound.play()
 		if goblin.right:
 			goblinFacing = 1
 			
@@ -171,6 +191,7 @@ while run:
 		else:
 			goblin.isJump = False
 			goblin.jump = 10
+			
 	redrawWindow()
 	
 pygame.quit()
