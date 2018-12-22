@@ -1,6 +1,8 @@
 # First-Python-Game
 First game using pygame library on python-
 
+This project was mainly to excercise my Object oriented skills in python and was purely made for fun
+
 Dependencies:
 -------------
 
